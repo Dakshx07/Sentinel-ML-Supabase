@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { User, Repository } from './types';
-import { ThemeProvider } from './components/ThemeContext';
-import { ToastProvider } from './components/ToastContext';
-import GlobalSearchModal from './components/GlobalSearchModal';
+import { ThemeProvider } from './components/common/ThemeContext';
+import { ToastProvider } from './components/common/ToastContext';
+import GlobalSearchModal from './components/dashboard/GlobalSearchModal';
 import { getCurrentUser, logout, updateUser, initAuthListener } from './services/authService';
 import { supabase } from './lib/supabase';
 
@@ -12,25 +12,26 @@ import LandingLayout from './src/layouts/LandingLayout';
 import DashboardLayout from './src/layouts/DashboardLayout';
 
 // Components (Eager load for critical paths)
-import LandingPage from './components/LandingPage';
-import AuthPage from './components/AuthPage';
-import PricingPage from './components/PricingPage';
+// Components (Eager load for critical paths)
+import LandingPage from './components/landing/LandingPage';
+import AuthPage from './components/auth/AuthPage';
+import PricingPage from './components/landing/PricingPage';
 
 // Components (Lazy load for Dashboard)
-const DeveloperCommandCenter = React.lazy(() => import('./components/DeveloperCommandCenter'));
-const SmartAlerts = React.lazy(() => import('./components/SmartAlerts'));
-const RepositoriesDashboard = React.lazy(() => import('./components/RepositoriesDashboard').then(module => ({ default: module.RepositoriesDashboard })));
-const SentinelStudio = React.lazy(() => import('./components/SentinelStudio'));
-const GitHubScanner = React.lazy(() => import('./components/GitHubScanner'));
-const CommitScanner = React.lazy(() => import('./components/CommitScanner'));
-const PushPullPanel = React.lazy(() => import('./components/PushPullPanel'));
-const RefactorSimulator = React.lazy(() => import('./components/RefactorSimulator'));
-const RepoReportDashboard = React.lazy(() => import('./components/RepoReportDashboard'));
-const DevWorkflowStreamliner = React.lazy(() => import('./components/DevWorkflowStreamliner'));
-const READMEGenerator = React.lazy(() => import('./components/READMEGenerator'));
-const ImageGenerator = React.lazy(() => import('./components/ImageGenerator'));
-const SettingsPage = React.lazy(() => import('./components/SettingsPage'));
-const DocumentationDashboard = React.lazy(() => import('./components/DocumentationDashboard'));
+const DeveloperCommandCenter = React.lazy(() => import('./components/dashboard/DeveloperCommandCenter'));
+const SmartAlerts = React.lazy(() => import('./components/dashboard/SmartAlerts'));
+const RepositoriesDashboard = React.lazy(() => import('./components/dashboard/RepositoriesDashboard').then(module => ({ default: module.RepositoriesDashboard })));
+const SentinelStudio = React.lazy(() => import('./components/dashboard/SentinelStudio'));
+const GitHubScanner = React.lazy(() => import('./components/dashboard/GitHubScanner'));
+const CommitScanner = React.lazy(() => import('./components/dashboard/CommitScanner'));
+const PushPullPanel = React.lazy(() => import('./components/dashboard/PushPullPanel'));
+const RefactorSimulator = React.lazy(() => import('./components/dashboard/RefactorSimulator'));
+const RepoReportDashboard = React.lazy(() => import('./components/dashboard/RepoReportDashboard'));
+const DevWorkflowStreamliner = React.lazy(() => import('./components/dashboard/DevWorkflowStreamliner'));
+const READMEGenerator = React.lazy(() => import('./components/dashboard/READMEGenerator'));
+const ImageGenerator = React.lazy(() => import('./components/dashboard/ImageGenerator'));
+const SettingsPage = React.lazy(() => import('./components/dashboard/SettingsPage'));
+const DocumentationDashboard = React.lazy(() => import('./components/dashboard/DocumentationDashboard'));
 
 const AppContent: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);

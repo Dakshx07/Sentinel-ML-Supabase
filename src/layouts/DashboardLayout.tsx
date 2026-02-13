@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import GlobalSearchModal from '../../components/GlobalSearchModal';
+import Sidebar from '../../components/common/Sidebar';
+import Header from '../../components/common/Header';
+import GlobalSearchModal from '../../components/dashboard/GlobalSearchModal';
 import { User, DashboardView, Repository, AppView } from '../../types';
 import { logout } from '../../services/authService';
 

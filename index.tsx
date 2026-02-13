@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import './index.css';
 import App from './App';
-import ErrorBoundary from './components/ErrorBoundary';
+import { supabase } from './lib/supabase';
 
 // FIX: Expose React to the global window object.
 // UMD scripts like SWR and React-ApexCharts depend on window.React being available.
