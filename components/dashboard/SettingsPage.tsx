@@ -155,7 +155,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, onProfileUpdate }) =>
     );
 
     return (
-        <div className="h-full w-full p-2 space-y-8 animate-fade-in-up">
+        <div className="flex-1 w-full p-2 space-y-8 animate-fade-in-up">
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}

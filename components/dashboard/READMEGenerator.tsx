@@ -137,7 +137,7 @@ const READMEGenerator: React.FC<READMEGeneratorProps> = ({ repos, user, onNaviga
 
     if (apiKeyMissing || !user?.github) {
         return (
-            <div className="h-full w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex-1 w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
                 <div className="text-center">
                     <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                         <ErrorIcon className="w-10 h-10 text-red-500" />
@@ -161,7 +161,7 @@ const READMEGenerator: React.FC<READMEGeneratorProps> = ({ repos, user, onNaviga
     const isLoading = state === 'analyzing' || state === 'generating' || state === 'creating_pr';
 
     return (
-        <div className="h-full w-full flex flex-col space-y-4 animate-fade-in-up">
+        <div className="flex-1 w-full flex flex-col space-y-4 animate-fade-in-up">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
                 <div className="flex items-center space-x-4">

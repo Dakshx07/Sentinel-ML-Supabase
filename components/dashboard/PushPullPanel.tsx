@@ -482,7 +482,7 @@ const PushPullPanel: React.FC<PushPullPanelProps> = ({ setActiveView, repos }) =
 
     if (error) {
         return (
-            <div className="h-full w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+            <div className="flex-1 w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
                 <div className="text-center">
                     <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
                         <SettingsIcon className="w-10 h-10 text-red-500" />
@@ -504,7 +504,7 @@ const PushPullPanel: React.FC<PushPullPanelProps> = ({ setActiveView, repos }) =
     }
 
     return (
-        <div className="h-full w-full flex flex-col bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl animate-fade-in-up">
+        <div className="flex-1 w-full flex flex-col bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl animate-fade-in-up">
             {/* Header */}
             <div className="p-5 border-b border-white/5 flex-shrink-0 space-y-4 bg-black/20">
                 <div className="flex items-center justify-between">

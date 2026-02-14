@@ -230,7 +230,7 @@ const RefactorSimulator: React.FC<RefactorSimulatorProps> = ({ onNavigateToSetti
     };
 
     const PromptMessage: React.FC<{ icon: React.ReactNode, title: string, message: string, buttonLabel?: string, onButtonClick?: () => void }> = ({ icon, title, message, buttonLabel, onButtonClick }) => (
-        <div className="h-full w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+        <div className="flex-1 w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
             <div className="text-center">
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
                     {icon}
@@ -277,7 +277,7 @@ const RefactorSimulator: React.FC<RefactorSimulatorProps> = ({ onNavigateToSetti
     }
 
     return (
-        <div className="h-full w-full flex flex-col space-y-4 animate-fade-in-up">
+        <div className="flex-1 w-full flex flex-col space-y-4 animate-fade-in-up">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
                 <div>

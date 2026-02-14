@@ -46,7 +46,7 @@ const SmartAlerts: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full max-w-5xl mx-auto space-y-6 animate-fade-in-up">
+        <div className="flex-1 w-full max-w-5xl mx-auto space-y-6 animate-fade-in-up">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
                 <div className="flex items-center space-x-4">

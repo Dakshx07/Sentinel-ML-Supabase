@@ -124,7 +124,7 @@ const RepoReportDashboard: React.FC<RepoReportDashboardProps> = ({ repos, user, 
 
     if (apiKeyMissing || !user?.github) {
         return (
-            <div className="h-full w-full flex items-center justify-center p-4">
+            <div className="flex-1 w-full flex items-center justify-center p-4">
                 <div className="text-center bg-[#050505]/80 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl max-w-md relative overflow-hidden">
                     <div className="absolute inset-0 bg-red-500/5 blur-[50px] rounded-full pointer-events-none" />
                     <ErrorIcon className="w-16 h-16 text-red-500 mb-6 mx-auto animate-pulse relative z-10" />
@@ -140,7 +140,7 @@ const RepoReportDashboard: React.FC<RepoReportDashboardProps> = ({ repos, user, 
 
     if (repos.length === 0) {
         return (
-            <div className="h-full w-full flex items-center justify-center p-4">
+            <div className="flex-1 w-full flex items-center justify-center p-4">
                 <div className="text-center bg-[#050505]/80 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-2xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-blue-500/5 blur-[50px] rounded-full pointer-events-none" />
                     <GithubIcon className="w-16 h-16 text-gray-600 mb-6 mx-auto relative z-10" />
@@ -152,7 +152,7 @@ const RepoReportDashboard: React.FC<RepoReportDashboardProps> = ({ repos, user, 
     }
 
     return (
-        <div className="h-full w-full flex flex-col space-y-6 animate-fade-in-up p-2">
+        <div className="flex-1 w-full flex flex-col space-y-6 animate-fade-in-up p-2">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>

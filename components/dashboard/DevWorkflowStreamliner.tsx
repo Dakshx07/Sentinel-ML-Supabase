@@ -264,7 +264,7 @@ const DevWorkflowStreamliner: React.FC<DevWorkflowStreamlinerProps> = ({ repos, 
     }
 
     return (
-        <div className="h-full w-full flex flex-col space-y-4 animate-fade-in-up">
+        <div className="flex-1 w-full flex flex-col space-y-4 animate-fade-in-up">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
                 <div className="flex items-center space-x-4">

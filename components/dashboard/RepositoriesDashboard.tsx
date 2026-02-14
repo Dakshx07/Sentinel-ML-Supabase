@@ -132,7 +132,7 @@ export const RepositoriesDashboard: React.FC<RepositoriesDashboardProps> = ({ us
     }
 
     return (
-        <div className="h-full w-full space-y-8 p-2">
+        <div className="flex-1 w-full space-y-8 p-2">
             {isAddModalOpen && <AddRepoModal onClose={() => setIsAddModalOpen(false)} onAddRepos={handleAddRepos} existingRepoIds={repos.map(r => r.id)} />}
 
             {/* Header */}

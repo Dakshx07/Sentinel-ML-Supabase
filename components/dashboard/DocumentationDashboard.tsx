@@ -195,7 +195,7 @@ const DocsContent: React.FC = () => {
 
 const DocumentationDashboard: React.FC = () => {
     return (
-        <div className="h-full w-full flex flex-col bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl animate-fade-in-up">
+        <div className="flex-1 w-full flex flex-col bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl animate-fade-in-up">
             <div className="p-6 border-b border-white/5 flex items-center space-x-4 bg-black/20">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.3)]">
                     <DocsIcon className="w-6 h-6 text-white" />

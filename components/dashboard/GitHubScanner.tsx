@@ -227,7 +227,7 @@ const GitHubScanner: React.FC<GitHubScannerProps> = ({ user, onNavigateToSetting
     };
 
     return (
-        <div className="h-full w-full bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden flex flex-col lg:flex-row shadow-2xl animate-fade-in-up">
+        <div className="flex-1 w-full bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden flex flex-col lg:flex-row shadow-2xl animate-fade-in-up">
             {/* Left Panel - File Tree */}
             <motion.div
                 initial={false}

@@ -86,7 +86,7 @@ const DeveloperCommandCenter: React.FC<DeveloperCommandCenterProps> = ({ user, s
     ];
 
     return (
-        <div className="h-full w-full flex flex-col space-y-6 animate-fade-in-up p-6 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 w-full flex flex-col space-y-6 animate-fade-in-up p-6 overflow-y-auto custom-scrollbar">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

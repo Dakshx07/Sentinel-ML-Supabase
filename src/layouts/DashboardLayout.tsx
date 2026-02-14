@@ -1,10 +1,11 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../../components/common/Sidebar';
-import Header from '../../components/common/Header';
 import GlobalSearchModal from '../../components/dashboard/GlobalSearchModal';
 import { User, DashboardView, Repository, AppView } from '../../types';
 import { logout } from '../../services/authService';
+
+import UserProfileDropdown from '../../components/dashboard/UserProfileDropdown';
 
 interface DashboardLayoutProps {
     user: User | null;
@@ -49,6 +50,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, repos }) => {
         const path = location.pathname.replace('/app', '');
         if (path === '' || path === '/') return 'developerCommandCenter';
         const view = path.substring(1);
+        if (view === '') return 'developerCommandCenter';
         return view.split('/')[0] as DashboardView;
     };
 
@@ -58,15 +60,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, repos }) => {
         } else {
             navigate(`/app/${view}`);
         }
-    };
-
-    const handleHeaderNavigate = (view: AppView | DashboardView, options?: any) => {
-        if (view === 'landing') navigate('/');
-        else if (view === 'pricing') navigate('/pricing');
-        else if (view === 'auth') navigate('/login');
-        else if (view === 'dashboard') navigate('/app');
-        else if (view === 'studio') navigate('/app/studio');
-        else if (view === 'settings') navigate('/app/settings');
     };
 
     const handleSearchNavigate = (view: DashboardView) => {
@@ -96,7 +89,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, repos }) => {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white font-sans">
+        <div className="min-h-screen bg-black text-white font-sans flex relative">
             {/* Global Search Modal */}
             <GlobalSearchModal
                 isOpen={isSearchOpen}
@@ -105,35 +98,37 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, repos }) => {
                 onNavigate={handleSearchNavigate}
             />
 
-            <Header
-                currentView="dashboard"
-                user={user}
-                onNavigate={handleHeaderNavigate}
-                repoCount={repos.length}
-                autoReviewCount={repos.filter(r => r.autoReview).length}
-                onSignOut={handleSignOut}
-                onToggleSearch={() => setIsSearchOpen(true)}
-            />
             <Sidebar
                 activeView={getActiveView()}
                 setActiveView={handleSidebarNavigate}
                 isCollapsed={isSidebarCollapsed}
                 setIsCollapsed={setIsSidebarCollapsed}
+                user={user}
+                onLogout={handleSignOut}
+                onToggleSearch={() => setIsSearchOpen(true)}
             />
+
+            {/* Top Right Profile Dropdown */}
+            <div className="fixed top-6 right-8 z-50 hidden lg:block">
+                <UserProfileDropdown user={user} repos={repos} onLogout={handleSignOut} />
+            </div>
+
             <main
-                className="absolute top-24 right-0 bottom-0 overflow-y-auto p-6 md:p-8 transition-all duration-300 bg-black"
-                style={{ left: isSidebarCollapsed ? '4.5rem' : '15rem' }}
+                className="flex-1 transition-all duration-300 bg-black overflow-y-auto h-screen"
+                style={{ marginLeft: isSidebarCollapsed ? '4.5rem' : '16rem' }}
             >
-                <Suspense fallback={
-                    <div className="h-full w-full flex items-center justify-center">
-                        <div className="flex flex-col items-center space-y-4">
-                            <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                            <p className="text-gray-500 text-sm font-mono">Loading Module...</p>
+                <div className="px-8 pb-8 pt-24 min-h-full flex flex-col">
+                    <Suspense fallback={
+                        <div className="h-full w-full flex items-center justify-center pt-20">
+                            <div className="flex flex-col items-center space-y-4">
+                                <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                <p className="text-gray-500 text-sm font-mono">Loading Module...</p>
+                            </div>
                         </div>
-                    </div>
-                }>
-                    <Outlet />
-                </Suspense>
+                    }>
+                        <Outlet />
+                    </Suspense>
+                </div>
             </main>
         </div>
     );
