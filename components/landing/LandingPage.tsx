@@ -18,6 +18,7 @@ const RevealText = lazy(() => import('../ui/RevealText'));
 const ContainerScroll = lazy(() => import('../ui/ContainerScroll'));
 const WebGLShader = lazy(() => import('../ui/WebGLShader'));
 
+
 // --- Utility ---
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -131,7 +132,7 @@ const Navbar = ({ onNavigate }: { onNavigate: any }) => {
                 <Logo />
 
                 <div className="hidden md:flex items-center space-x-2">
-                    <NavLink href="#features">Features</NavLink>
+                    <NavLink href="/features">Features</NavLink>
                     <NavLink href="#how-it-works">How it Works</NavLink>
                     <NavLink href="#testimonials">Testimonials</NavLink>
                     <NavLink href="#pricing">Pricing</NavLink>
@@ -167,6 +168,8 @@ const Navbar = ({ onNavigate }: { onNavigate: any }) => {
         </motion.nav>
     );
 };
+
+
 
 
 const Hero = ({ onNavigate }: { onNavigate: any }) => {
@@ -479,28 +482,7 @@ const Hero = ({ onNavigate }: { onNavigate: any }) => {
 
 
 
-const Marquee = () => {
-    return (
-        <div className="py-12 bg-black border-y border-white/5 overflow-hidden relative">
-            <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-black to-transparent z-10"></div>
-            <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-black to-transparent z-10"></div>
 
-            <motion.div
-                className="flex space-x-24 min-w-max"
-                animate={{ x: ["0%", "-50%"] }}
-                transition={{ repeat: Infinity, ease: "linear", duration: 30 }}
-            >
-                {[...Array(2)].map((_, i) => (
-                    <div key={i} className="flex space-x-24 items-center opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
-                        {['ACME Corp', 'Nebula', 'Vertex', 'CyberDyne', 'Massive', 'Global', 'TechFlow', 'SecureNet'].map((logo, j) => (
-                            <span key={j} className="text-2xl font-bold font-heading text-white hover:text-indigo-400 transition-colors cursor-default">{logo}</span>
-                        ))}
-                    </div>
-                ))}
-            </motion.div>
-        </div>
-    );
-};
 
 // Tech Stack Infinite Scroller - Project Technologies
 const TechStackScroller = () => {
@@ -510,7 +492,7 @@ const TechStackScroller = () => {
         { name: 'Vite', color: 'from-purple-400 to-yellow-400' },
         { name: 'Tailwind CSS', color: 'from-cyan-400 to-teal-500' },
         { name: 'Framer Motion', color: 'from-pink-400 to-purple-500' },
-        { name: 'Back4App', color: 'from-blue-400 to-indigo-500' },
+
         { name: 'Gemini AI', color: 'from-blue-500 to-purple-600' },
         { name: 'GitHub API', color: 'from-gray-400 to-gray-600' },
         { name: 'Lucide Icons', color: 'from-orange-400 to-red-400' },
@@ -1579,6 +1561,8 @@ const CTA = ({ onNavigate }: { onNavigate: any }) => {
     );
 };
 
+
+
 const Footer = () => {
     const footerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
@@ -1748,7 +1732,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         <div className="min-h-screen bg-black text-white font-sans selection:bg-white selection:text-black overflow-x-hidden">
             <Navbar onNavigate={onNavigate} />
             <Hero onNavigate={onNavigate} />
-            <Marquee />
+
             <Features />
             <DemoShowcase />
             <TechStackScroller />
