@@ -49,9 +49,7 @@ Follow these steps to set up and configure Sentinel-ML-Back4app:
 
 2.  **Install Dependencies:**
     ```bash
-    npm install
-    # or if you prefer yarn:
-    # yarn install
+    pnpm install
     ```
 
 3.  **Environment Configuration:**
@@ -67,14 +65,14 @@ Follow these steps to set up and configure Sentinel-ML-Back4app:
 4.  **Start Development Server (Optional):**
     To run the application in development mode with hot-reloading:
     ```bash
-    npm run dev
+    pnpm dev
     ```
     This will typically launch the application on `http://localhost:3000`.
 
 5.  **Build for Production:**
     To compile the application for production deployment:
     ```bash
-    npm run build
+    pnpm build
     ```
     The optimized production assets will be generated in the `dist` directory.
 
