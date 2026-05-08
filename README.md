@@ -1,6 +1,6 @@
-# Dakshx07/Sentinel-ML-Back4app
+# Sentinel AI: Secure Your Code
 
-![License](https://img.shields.io/github/license/Dakshx07/Sentinel-ML-Back4app) ![Stars](https://img.shields.io/github/stars/Dakshx07/Sentinel-ML-Back4app?style=social) ![Language](https://img.shields.io/github/languages/top/Dakshx07/Sentinel-ML-Back4app)
+![skills.sh](https://skills.sh/b/Dakshx07/Sentinel-ML-Supabase) ![License](https://img.shields.io/github/license/Dakshx07/Sentinel-ML-Supabase) ![Stars](https://img.shields.io/github/stars/Dakshx07/Sentinel-ML-Supabase?style=social) ![Language](https://img.shields.io/github/languages/top/Dakshx07/Sentinel-ML-Supabase)
 
 ## 📖 Table of Contents
 - [Project Overview](#project-overview)
