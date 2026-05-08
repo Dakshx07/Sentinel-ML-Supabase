@@ -1,10 +1,10 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import GlobalSearchModal from '../../components/GlobalSearchModal';
-import { User, DashboardView, Repository, AppView } from '../../types';
-import { logout } from '../../services/authService';
+import Sidebar from '@/src/components/layout/Sidebar';
+import Header from '@/src/components/layout/Header';
+import GlobalSearchModal from '@/src/components/features/GlobalSearchModal';
+import { User, DashboardView, Repository, AppView } from '@/types';
+import { logout } from '@/services/authService';
 
 interface DashboardLayoutProps {
     user: User | null;

@@ -1,0 +1,383 @@
+import React, { useState, useEffect } from 'react';
+import { Repository, User } from '@/types';
+import { useToast } from '@/src/components/ui/ToastContext';
+import { DocumentPlusIcon, SpinnerIcon, ErrorIcon, SettingsIcon, GithubIcon, BrainCircuitIcon, EyeIcon, CodeIcon, ChevronDownIcon } from '@/src/components/ui/icons';
+import { generateReadmeFromContext, isApiKeySet } from '@/services/geminiService';
+import { createOrUpdateReadmeAndPR, getRepoContextForReadme, parseGitHubUrl } from '@/services/githubService';
+import CodeMirror from '@uiw/react-codemirror';
+import { createTheme } from '@uiw/codemirror-themes';
+import { tags as t } from '@lezer/highlight';
+import { javascript } from '@codemirror/lang-javascript';
+import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import Dropdown from '@/src/components/ui/Dropdown';
+
+interface READMEGeneratorProps {
+    repos: Repository[];
+    user: User | null;
+    onNavigateToSettings: () => void;
+}
+
+type GeneratorState = 'idle' | 'analyzing' | 'generating' | 'done' | 'creating_pr';
+type ViewMode = 'edit' | 'preview' | 'split';
+
+const templateOptions = [
+    { id: 'auto', name: '🤖 Auto-Select Style' },
+    { id: 'minimalist', name: 'Minimalist' },
+    { id: 'startup', name: 'Startup' },
+    { id: 'open-source', name: 'Open Source' },
+    { id: 'enterprise', name: 'Enterprise' },
+    { id: 'docs', name: 'Documentation' },
+];
+
+// Custom Dark Theme for CodeMirror - Pure Black
+const editorTheme = createTheme({
+    theme: 'dark',
+    settings: {
+        background: '#000000',
+        backgroundImage: '',
+        foreground: '#e5e7eb',
+        caret: '#22c55e',
+        selection: '#22c55e33',
+        selectionMatch: '#22c55e33',
+        lineHighlight: '#ffffff08',
+        gutterBackground: '#000000',
+        gutterForeground: '#4b5563',
+    },
+    styles: [
+        { tag: t.comment, color: '#6b7280' },
+        { tag: t.variableName, color: '#e5e7eb' },
+        { tag: [t.string, t.special(t.brace)], color: '#4ade80' },
+        { tag: t.number, color: '#facc15' },
+        { tag: t.bool, color: '#facc15' },
+        { tag: t.null, color: '#facc15' },
+        { tag: t.keyword, color: '#22c55e' },
+        { tag: t.operator, color: '#22c55e' },
+        { tag: t.className, color: '#4ade80' },
+        { tag: t.definition(t.typeName), color: '#4ade80' },
+        { tag: t.typeName, color: '#4ade80' },
+        { tag: t.angleBracket, color: '#6b7280' },
+        { tag: t.tagName, color: '#22c55e' },
+        { tag: t.attributeName, color: '#4ade80' },
+    ],
+});
+
+const READMEGenerator: React.FC<READMEGeneratorProps> = ({ repos, user, onNavigateToSettings }) => {
+    const { addToast } = useToast();
+    const [selectedRepoFullName, setSelectedRepoFullName] = useState<string>('');
+    const [state, setState] = useState<GeneratorState>('idle');
+    const [apiKeyMissing, setApiKeyMissing] = useState(false);
+    const [generatedReadme, setGeneratedReadme] = useState('');
+    const [selectedTemplate, setSelectedTemplate] = useState('auto');
+    const [viewMode, setViewMode] = useState<ViewMode>('split');
+
+    useEffect(() => {
+        if (repos.length > 0 && !selectedRepoFullName) {
+            setSelectedRepoFullName(repos[0].full_name);
+        }
+    }, [repos, selectedRepoFullName]);
+
+    useEffect(() => {
+        setApiKeyMissing(!isApiKeySet());
+    }, []);
+
+    const handleGenerate = async () => {
+        if (!selectedRepoFullName) {
+            addToast('Please select a repository.', 'warning');
+            return;
+        }
+
+        setState('analyzing');
+        setGeneratedReadme('');
+        addToast('Starting deep repository analysis...', 'info');
+
+        try {
+            const context = await getRepoContextForReadme(selectedRepoFullName);
+
+            setState('generating');
+            addToast('Analysis complete. Generating README with AI...', 'info');
+
+            const content = await generateReadmeFromContext(context, selectedTemplate);
+            setGeneratedReadme(content);
+            setState('done');
+            addToast('README generated successfully!', 'success');
+
+        } catch (e: any) {
+            addToast(e.message, 'error');
+            setState('idle');
+        }
+    };
+
+    const handleCreatePR = async () => {
+        if (!generatedReadme) {
+            addToast('Please generate a README before creating a PR.', 'warning');
+            return;
+        }
+        setState('creating_pr');
+        try {
+            const parsed = parseGitHubUrl(`https://github.com/${selectedRepoFullName}`);
+            if (!parsed) throw new Error("Invalid repo name.");
+
+            const prUrl = await createOrUpdateReadmeAndPR(
+                parsed.owner, parsed.repo, generatedReadme,
+                "docs: Add/Update README.md with Sentinel AI",
+                "This PR was generated by Sentinel AI's autonomous README Generator."
+            );
+
+            addToast(<span>PR created successfully! <a href={prUrl} target="_blank" rel="noopener noreferrer" className="underline">View Pull Request</a></span>, 'success');
+            setState('idle');
+            setGeneratedReadme('');
+
+        } catch (e: any) {
+            addToast(e.message, 'error');
+            setState('done');
+        }
+    };
+
+    if (apiKeyMissing || !user?.github) {
+        return (
+            <div className="h-full w-full flex items-center justify-center p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+                <div className="text-center">
+                    <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                        <ErrorIcon className="w-10 h-10 text-red-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2 font-heading">Access Required</h3>
+                    <p className="text-gray-400 max-w-sm text-sm leading-relaxed mb-8">Security protocols require API configuration and GitHub authentication.</p>
+                    <motion.button
+                        onClick={onNavigateToSettings}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-6 py-3 bg-white text-black font-bold text-sm rounded-full flex items-center space-x-2 mx-auto hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all"
+                    >
+                        <SettingsIcon className="w-4 h-4" />
+                        <span>Configure Access</span>
+                    </motion.button>
+                </div>
+            </div>
+        );
+    }
+
+    const isLoading = state === 'analyzing' || state === 'generating' || state === 'creating_pr';
+
+    return (
+        <div className="h-full w-full flex flex-col space-y-4 animate-fade-in-up">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-black/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl">
+                <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                        <DocumentPlusIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-white font-heading tracking-tight">README Generator</h1>
+                        <p className="text-sm text-gray-400">AI-powered documentation architect.</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
+                {/* Left Panel - Controls */}
+                <div className="lg:col-span-3 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 p-6 flex flex-col shadow-2xl">
+                    <h2 className="text-xs font-bold font-heading text-gray-500 uppercase tracking-wider mb-4">Configuration</h2>
+
+                    {/* Repository Selector */}
+                    <div className="mb-4">
+                        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">Repository</label>
+                        {repos.length > 0 ? (
+                            <Dropdown
+                                trigger={
+                                    <button className="flex items-center justify-between w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-xl hover:border-white/20 transition-colors text-sm">
+                                        <span className="truncate">{selectedRepoFullName || 'Select Repository'}</span>
+                                        <ChevronDownIcon className="w-4 h-4 text-gray-500 ml-2" />
+                                    </button>
+                                }
+                                items={repos.map(repo => ({
+                                    id: repo.full_name,
+                                    label: repo.full_name,
+                                    onClick: () => setSelectedRepoFullName(repo.full_name)
+                                }))}
+                                width="w-full"
+                            />
+                        ) : (
+                            <div className="flex items-center space-x-2 text-gray-500 text-sm p-3 bg-white/5 rounded-xl border border-white/5">
+                                <span>Add a repo first</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Template Selector */}
+                    <div className="mb-6">
+                        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">Template Style</label>
+                        <Dropdown
+                            trigger={
+                                <button className="flex items-center justify-between w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-xl hover:border-white/20 transition-colors text-sm">
+                                    <span className="truncate">{templateOptions.find(t => t.id === selectedTemplate)?.name || 'Select Template'}</span>
+                                    <ChevronDownIcon className="w-4 h-4 text-gray-500 ml-2" />
+                                </button>
+                            }
+                            items={templateOptions.map(opt => ({
+                                id: opt.id,
+                                label: opt.name,
+                                onClick: () => setSelectedTemplate(opt.id)
+                            }))}
+                            width="w-full"
+                        />
+                    </div>
+
+                    {/* Generate Button */}
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={state === 'done' ? handleCreatePR : handleGenerate}
+                        disabled={isLoading || !selectedRepoFullName}
+                        className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 transition-all ${isLoading
+                            ? 'bg-white/5 text-gray-500 cursor-not-allowed border border-white/5'
+                            : state === 'done'
+                                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]'
+                                : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]'
+                            }`}
+                    >
+                        {isLoading ? (
+                            <><SpinnerIcon className="w-4 h-4 animate-spin" /> <span>Processing...</span></>
+                        ) : state === 'done' ? (
+                            <><GithubIcon className="w-4 h-4" /> <span>Create Pull Request</span></>
+                        ) : (
+                            <><BrainCircuitIcon className="w-4 h-4" /> <span>Generate README</span></>
+                        )}
+                    </motion.button>
+
+                    {/* View Mode Toggle */}
+                    <div className="mt-auto pt-6 border-t border-white/5">
+                        <label className="text-xs text-gray-500 uppercase tracking-wider block mb-3">View Mode</label>
+                        <div className="flex bg-white/5 rounded-xl p-1">
+                            <button
+                                onClick={() => setViewMode('edit')}
+                                className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center space-x-1.5 ${viewMode === 'edit' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                            >
+                                <CodeIcon className="w-3.5 h-3.5" /> <span>Editor</span>
+                            </button>
+                            <button
+                                onClick={() => setViewMode('split')}
+                                className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all hidden md:flex items-center justify-center space-x-1.5 ${viewMode === 'split' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                            >
+                                <span>Split</span>
+                            </button>
+                            <button
+                                onClick={() => setViewMode('preview')}
+                                className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all flex items-center justify-center space-x-1.5 ${viewMode === 'preview' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                            >
+                                <EyeIcon className="w-3.5 h-3.5" /> <span>Preview</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Panel - Editor/Preview */}
+                <div className="lg:col-span-9 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl flex flex-col min-h-0">
+                    {/* Loading Overlay */}
+                    <AnimatePresence>
+                        {isLoading && state !== 'creating_pr' && (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm rounded-3xl"
+                            >
+                                <div className="relative">
+                                    <div className="w-20 h-20 border-2 border-white/10 border-t-green-500 rounded-full animate-spin"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <BrainCircuitIcon className="w-8 h-8 text-green-500 animate-pulse" />
+                                    </div>
+                                </div>
+                                <p className="mt-6 text-lg font-bold text-white animate-pulse">
+                                    {state === 'analyzing' ? 'Analyzing Repository...' : 'Generating README...'}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-2">This may take a moment</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Editor/Preview Grid */}
+                    <div className={`flex-grow grid min-h-0 ${viewMode === 'split' ? 'grid-cols-2 divide-x divide-white/10' : 'grid-cols-1'}`}>
+                        {/* Editor Pane */}
+                        {(viewMode === 'edit' || viewMode === 'split') && (
+                            <div className="h-full overflow-hidden flex flex-col bg-black">
+                                <div className="bg-white/5 px-4 py-3 border-b border-white/5 text-xs font-medium text-gray-500 uppercase tracking-wider flex justify-between items-center">
+                                    <span>Markdown Source</span>
+                                    {generatedReadme && (
+                                        <span className="text-[10px] bg-white/5 px-2 py-1 rounded text-gray-600">
+                                            {generatedReadme.length} chars
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex-grow overflow-auto custom-scrollbar">
+                                    <CodeMirror
+                                        value={generatedReadme}
+                                        onChange={(value) => setGeneratedReadme(value)}
+                                        extensions={[javascript({ jsx: true })]}
+                                        theme={editorTheme}
+                                        className="h-full text-sm [&_.cm-editor]:!bg-black [&_.cm-scroller]:!bg-black [&_.cm-gutters]:!bg-black [&_.cm-content]:!bg-black [&_.cm-line]:!bg-black"
+                                        height="100%"
+                                        basicSetup={{
+                                            lineNumbers: true,
+                                            highlightActiveLineGutter: true,
+                                            highlightSpecialChars: true,
+                                            history: true,
+                                            foldGutter: true,
+                                            drawSelection: true,
+                                            dropCursor: true,
+                                            allowMultipleSelections: true,
+                                            indentOnInput: true,
+                                            syntaxHighlighting: true,
+                                            bracketMatching: true,
+                                            closeBrackets: true,
+                                            autocompletion: true,
+                                            rectangularSelection: true,
+                                            crosshairCursor: true,
+                                            highlightActiveLine: true,
+                                            highlightSelectionMatches: true,
+                                            closeBracketsKeymap: true,
+                                            defaultKeymap: true,
+                                            searchKeymap: true,
+                                            historyKeymap: true,
+                                            foldKeymap: true,
+                                            completionKeymap: true,
+                                            lintKeymap: true,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Preview Pane */}
+                        {(viewMode === 'preview' || viewMode === 'split') && (
+                            <div className="h-full overflow-hidden flex flex-col bg-black">
+                                <div className="bg-white/5 px-4 py-3 border-b border-white/5 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <span>Live Preview</span>
+                                </div>
+                                <div className="flex-grow overflow-auto p-6 custom-scrollbar prose prose-invert max-w-none prose-headings:font-heading prose-a:text-green-400 prose-pre:bg-black prose-pre:border prose-pre:border-white/10 prose-blockquote:border-l-2 prose-blockquote:border-green-500 prose-blockquote:bg-white/5 prose-blockquote:px-4 prose-blockquote:py-1 prose-code:text-green-400 prose-code:bg-white/5 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                                    {generatedReadme ? (
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {generatedReadme}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        <div className="h-full flex flex-col items-center justify-center text-gray-600">
+                                            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                                                <EyeIcon className="w-8 h-8" />
+                                            </div>
+                                            <p className="text-sm">Preview will appear here</p>
+                                            <p className="text-xs text-gray-700 mt-1">Generate a README to see the preview</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default READMEGenerator;

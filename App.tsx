@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { User, Repository } from './types';
-import { ThemeProvider } from './components/ThemeContext';
-import { ToastProvider } from './components/ToastContext';
-import GlobalSearchModal from './components/GlobalSearchModal';
+import { ThemeProvider } from '@/src/components/ui/ThemeContext';
+import { ToastProvider } from '@/src/components/ui/ToastContext';
+import GlobalSearchModal from '@/src/components/features/GlobalSearchModal';
 import { getCurrentUser, logout, updateUser, initAuthListener } from './services/authService';
 import { supabase } from './lib/supabase';
 
@@ -12,25 +12,24 @@ import LandingLayout from './src/layouts/LandingLayout';
 import DashboardLayout from './src/layouts/DashboardLayout';
 
 // Components (Eager load for critical paths)
-import LandingPage from './components/LandingPage';
-import AuthPage from './components/AuthPage';
-import PricingPage from './components/PricingPage';
+import LandingPage from '@/src/pages/LandingPage';
+import AuthPage from '@/src/pages/AuthPage';
+import PricingPage from '@/src/pages/PricingPage';
 
-// Components (Lazy load for Dashboard)
-const DeveloperCommandCenter = React.lazy(() => import('./components/DeveloperCommandCenter'));
-const SmartAlerts = React.lazy(() => import('./components/SmartAlerts'));
-const RepositoriesDashboard = React.lazy(() => import('./components/RepositoriesDashboard').then(module => ({ default: module.RepositoriesDashboard })));
-const SentinelStudio = React.lazy(() => import('./components/SentinelStudio'));
-const GitHubScanner = React.lazy(() => import('./components/GitHubScanner'));
-const CommitScanner = React.lazy(() => import('./components/CommitScanner'));
-const PushPullPanel = React.lazy(() => import('./components/PushPullPanel'));
-const RefactorSimulator = React.lazy(() => import('./components/RefactorSimulator'));
-const RepoReportDashboard = React.lazy(() => import('./components/RepoReportDashboard'));
-const DevWorkflowStreamliner = React.lazy(() => import('./components/DevWorkflowStreamliner'));
-const READMEGenerator = React.lazy(() => import('./components/READMEGenerator'));
-const ImageGenerator = React.lazy(() => import('./components/ImageGenerator'));
-const SettingsPage = React.lazy(() => import('./components/SettingsPage'));
-const DocumentationDashboard = React.lazy(() => import('./components/DocumentationDashboard'));
+const DeveloperCommandCenter = React.lazy(() => import('@/src/components/features/DeveloperCommandCenter'));
+const SmartAlerts = React.lazy(() => import('@/src/components/features/SmartAlerts'));
+const RepositoriesDashboard = React.lazy(() => import('@/src/components/dashboard/RepositoriesDashboard').then(module => ({ default: module.RepositoriesDashboard })));
+const SentinelStudio = React.lazy(() => import('@/src/components/features/SentinelStudio'));
+const GitHubScanner = React.lazy(() => import('@/src/components/features/GitHubScanner'));
+const CommitScanner = React.lazy(() => import('@/src/components/features/CommitScanner'));
+const PushPullPanel = React.lazy(() => import('@/src/components/features/PushPullPanel'));
+const RefactorSimulator = React.lazy(() => import('@/src/components/features/RefactorSimulator'));
+const RepoReportDashboard = React.lazy(() => import('@/src/components/dashboard/RepoReportDashboard'));
+const DevWorkflowStreamliner = React.lazy(() => import('@/src/components/features/DevWorkflowStreamliner'));
+const READMEGenerator = React.lazy(() => import('@/src/components/features/READMEGenerator'));
+const ImageGenerator = React.lazy(() => import('@/src/components/features/ImageGenerator'));
+const SettingsPage = React.lazy(() => import('@/src/pages/SettingsPage'));
+const DocumentationDashboard = React.lazy(() => import('@/src/components/dashboard/DocumentationDashboard'));
 
 const AppContent: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
